@@ -27,7 +27,10 @@ const state = {
   cows: 0,
   horses: 0,
   phase: 'goat',
-  sheepRebuilding: false,
+  // Stack of stage names we need to re-enter after reversion.
+  // Each entry is 'sheep', 'cow', or 'horse'.
+  // Most-recently-reverted stage is pushed last (top = last element).
+  rebuildingStack: [],
   animals: [],
   hearts: [],
   confetti: [],
@@ -318,16 +321,22 @@ function handleShortAnswer() {
   }, 1500);
 }
 
+// --- Core answer handlers ---
+
 function handleCorrect() {
-  const phase = state.phase;
-  if (state.sheepRebuilding) {
-    spawnAnimal('sheep');
-    spawnAnimal('sheep');
-    state.sheepRebuilding = false;
+  // Rebuilding mode: a correct answer immediately re-enters the most-recently
+  // reverted stage by spawning 2 of it and setting the phase back to it.
+  if (state.rebuildingStack.length > 0) {
+    const rebuildTarget = state.rebuildingStack.pop();
+    state.phase = rebuildTarget;
+    spawnAnimal(rebuildTarget);
+    spawnAnimal(rebuildTarget);
     checkThresholds();
     return;
   }
 
+  // Normal mode: breed one animal of the current phase.
+  const phase = state.phase;
   const currentAnimals = state.animals.filter(a => a.type === phase && !a.isBaby && !a.isCombusting);
   if (currentAnimals.length >= 2) {
     const shuffled = shuffle(currentAnimals);
@@ -343,12 +352,11 @@ function handleCorrect() {
 }
 
 function handleWrong() {
-  let killType;
-  if (state.phase === 'goat') killType = 'goat';
-  else if (state.phase === 'sheep') killType = 'goat';
-  else if (state.phase === 'cow') killType = 'sheep';
-  else if (state.phase === 'horse') killType = 'cow';
+  const killType = state.phase;
+  // 'win' phase should never reach here, but guard anyway.
+  if (killType === 'win') return;
 
+  // Kill one non-baby, non-combusting animal of the CURRENT stage.
   const targets = state.animals.filter(a => a.type === killType && !a.isBaby && !a.isCombusting);
   if (targets.length > 0) {
     const victim = targets[Math.floor(Math.random() * targets.length)];
@@ -357,15 +365,74 @@ function handleWrong() {
 
   updateCounts();
 
-  const aliveGoats = state.animals.filter(a => a.type === 'goat' && !a.isCombusting).length;
-  if (aliveGoats <= 1 && state.phase === 'goat') {
-    setTimeout(() => triggerGameOver(), 1600);
-    return;
-  }
+  // Count remaining alive (non-combusting) animals of the current stage.
+  const aliveCount = state.animals.filter(a => a.type === killType && !a.isCombusting).length;
 
-  if (state.phase === 'sheep') {
-    const aliveCurrentPhase = state.animals.filter(a => a.type === 'sheep' && !a.isCombusting).length;
-    if (aliveCurrentPhase <= 0) state.sheepRebuilding = true;
+  if (killType === 'goat') {
+    // Goats are the last line of defence. When they drop to 1 the game is over.
+    if (aliveCount <= 1) {
+      // Combust the surviving goat (if any) for the visual effect.
+      if (aliveCount === 1) {
+        const lastOne = state.animals.find(a => a.type === 'goat' && !a.isCombusting);
+        if (lastOne) startCombustion(lastOne);
+      }
+      setTimeout(() => triggerGameOver(), 1600);
+    }
+  } else {
+    // For sheep / cow / horse: dropping to 1 triggers a stage reversion.
+    if (aliveCount <= 1) {
+      // Combust the surviving animal (if any) for the visual effect.
+      if (aliveCount === 1) {
+        const lastOne = state.animals.find(a => a.type === killType && !a.isCombusting);
+        if (lastOne) startCombustion(lastOne);
+      }
+      // Revert to the previous stage.
+      revertToPreviousStage(killType);
+    }
+  }
+}
+
+// Revert from `fromStage` to the stage below it.
+// Pushes `fromStage` onto rebuildingStack so the next correct answer
+// (or natural threshold re-hit) re-enters it.
+function revertToPreviousStage(fromStage) {
+  state.rebuildingStack.push(fromStage);
+
+  let prevStage, threshold;
+  if (fromStage === 'sheep')  { prevStage = 'goat';  threshold = 100; }
+  else if (fromStage === 'cow')   { prevStage = 'sheep'; threshold = 200; }
+  else if (fromStage === 'horse') { prevStage = 'cow';   threshold = 300; }
+  else return;
+
+  state.phase = prevStage;
+  restoreStage(prevStage, threshold);
+}
+
+// Ensure the count of alive (non-combusting) `animalType` animals equals
+// `targetCount`, spawning or removing extras as needed.
+function restoreStage(animalType, targetCount) {
+  const alive = state.animals.filter(a => a.type === animalType && !a.isCombusting);
+  const current = alive.length;
+  const needed = targetCount - current;
+  const b = getPastureBounds();
+
+  if (needed > 0) {
+    for (let i = 0; i < needed; i++) {
+      const x = b.left + Math.random() * (b.right - b.left);
+      const y = b.top + Math.random() * (b.bottom - b.top);
+      const a = new Animal(animalType, x, y);
+      state.animals.push(a);
+    }
+    state.totalEverSpawned += needed;
+    updateCounts();
+  } else if (needed < 0) {
+    // Remove the excess animals (oldest first).
+    const toRemove = alive.slice(0, -needed);
+    for (const a of toRemove) {
+      const idx = state.animals.indexOf(a);
+      if (idx > -1) state.animals.splice(idx, 1);
+    }
+    updateCounts();
   }
 }
 
@@ -387,26 +454,43 @@ function startCombustion(animal) {
 
 function checkThresholds() {
   updateCounts();
-  const goats = state.animals.filter(a => a.type === 'goat' && !a.isBaby && !a.isCombusting).length;
-  const sheep = state.animals.filter(a => a.type === 'sheep' && !a.isBaby && !a.isCombusting).length;
-  const cows = state.animals.filter(a => a.type === 'cow' && !a.isBaby && !a.isCombusting).length;
+  const goats  = state.animals.filter(a => a.type === 'goat'  && !a.isBaby && !a.isCombusting).length;
+  const sheep  = state.animals.filter(a => a.type === 'sheep' && !a.isBaby && !a.isCombusting).length;
+  const cows   = state.animals.filter(a => a.type === 'cow'   && !a.isBaby && !a.isCombusting).length;
   const horses = state.animals.filter(a => a.type === 'horse' && !a.isBaby && !a.isCombusting).length;
 
   if (state.phase === 'goat' && goats >= 100) {
     state.phase = 'sheep';
     spawnAnimal('sheep');
     spawnAnimal('sheep');
-    showPhaseTransition('SHEEP PHASE!', '🐑 You unlocked sheep!');
+    // If we were rebuilding sheep (threshold re-hit via breeding rather than
+    // an immediate-correct shortcut), pop from the stack silently.
+    const idx = state.rebuildingStack.lastIndexOf('sheep');
+    if (idx > -1) {
+      state.rebuildingStack.splice(idx, 1);
+    } else {
+      showPhaseTransition('SHEEP PHASE!', '🐑 You unlocked sheep!');
+    }
   } else if (state.phase === 'sheep' && sheep >= 200) {
     state.phase = 'cow';
     spawnAnimal('cow');
     spawnAnimal('cow');
-    showPhaseTransition('COW PHASE!', '🐄 Moo! You unlocked cows!');
+    const idx = state.rebuildingStack.lastIndexOf('cow');
+    if (idx > -1) {
+      state.rebuildingStack.splice(idx, 1);
+    } else {
+      showPhaseTransition('COW PHASE!', '🐄 Moo! You unlocked cows!');
+    }
   } else if (state.phase === 'cow' && cows >= 300) {
     state.phase = 'horse';
     spawnAnimal('horse');
     spawnAnimal('horse');
-    showPhaseTransition('HORSE PHASE!', '🐴 Galloping to victory!');
+    const idx = state.rebuildingStack.lastIndexOf('horse');
+    if (idx > -1) {
+      state.rebuildingStack.splice(idx, 1);
+    } else {
+      showPhaseTransition('HORSE PHASE!', '🐴 Galloping to victory!');
+    }
   } else if (state.phase === 'horse' && horses >= 400) {
     state.phase = 'win';
     triggerWin();
@@ -442,7 +526,7 @@ function restartGame() {
   state.cows = 0;
   state.horses = 0;
   state.phase = 'goat';
-  state.sheepRebuilding = false;
+  state.rebuildingStack = [];
   state.animals = [];
   state.hearts = [];
   state.confetti = [];

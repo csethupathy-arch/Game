@@ -183,20 +183,49 @@ function renderQuestion() {
     thresholdLabel = `${state.horses}/400 horses → WIN!`;
   }
 
+  const qType = q.type || 'multiple-choice';
+  let answerHTML = '';
+
+  if (qType === 'multiple-choice') {
+    answerHTML = `<div class="options-grid" id="optionsGrid">
+      ${q.options.map((opt, i) => `<button class="option-btn" data-idx="${i}" onclick="handleAnswer(${i})">${['A','B','C','D'][i]}. ${opt}</button>`).join('')}
+    </div>`;
+  } else if (qType === 'true-false') {
+    answerHTML = `<div class="tf-grid" id="optionsGrid">
+      <button class="option-btn tf-btn" onclick="handleTrueFalse(true)">True</button>
+      <button class="option-btn tf-btn" onclick="handleTrueFalse(false)">False</button>
+    </div>`;
+  } else if (qType === 'short-answer') {
+    answerHTML = `<div class="short-answer-row" id="optionsGrid">
+      <input type="text" id="shortAnswerInput" class="short-answer-input" placeholder="Enter your answer..." inputmode="decimal">
+      <span class="unit-label">${q.unit}</span>
+      <button class="option-btn submit-btn" id="shortAnswerSubmit" onclick="handleShortAnswer()">Submit</button>
+    </div>
+    <div class="explanation-text" id="explanationText" style="display:none;"></div>`;
+  }
+
   const qp = document.getElementById('questionPanel');
   qp.innerHTML = `
     <div class="phase-bar-row">
       <span class="phase-label">${phaseLabel} Phase · Tier ${diff}</span>
       <div class="progress-wrap">
-        <div class="progress-fill" style="width:${Math.min(1,progress)*100}%"></div>
+        <div class="progress-fill" style="width:${Math.min(1, progress) * 100}%"></div>
       </div>
       <span class="progress-text">${thresholdLabel}</span>
     </div>
     <div class="question-text">${q.question}</div>
-    <div class="options-grid" id="optionsGrid">
-      ${q.options.map((opt, i) => `<button class="option-btn" data-idx="${i}" onclick="handleAnswer(${i})">${['A','B','C','D'][i]}. ${opt}</button>`).join('')}
-    </div>
+    ${answerHTML}
   `;
+
+  if (qType === 'short-answer') {
+    const input = document.getElementById('shortAnswerInput');
+    if (input) {
+      input.focus();
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleShortAnswer();
+      });
+    }
+  }
 }
 
 function handleAnswer(idx) {
@@ -204,7 +233,7 @@ function handleAnswer(idx) {
   state.questionAnswered = true;
 
   const correct = state.currentQuestion.correct;
-  const buttons = document.querySelectorAll('.option-btn');
+  const buttons = document.querySelectorAll('.option-btn:not(.tf-btn):not(.submit-btn)');
   buttons.forEach((btn, i) => {
     btn.disabled = true;
     if (i === correct) btn.classList.add('correct');
@@ -212,6 +241,73 @@ function handleAnswer(idx) {
   });
 
   if (idx === correct) {
+    handleCorrect();
+  } else {
+    handleWrong();
+  }
+
+  setTimeout(() => {
+    if (!state.gameOver && !state.won) loadNewQuestion();
+  }, 1500);
+}
+
+function handleTrueFalse(playerAnswer) {
+  if (state.questionAnswered || state.gameOver || state.won) return;
+  state.questionAnswered = true;
+
+  const correct = state.currentQuestion.correct; // boolean
+  const buttons = document.querySelectorAll('.tf-btn');
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    const btnValue = btn.textContent.trim() === 'True';
+    if (btnValue === correct) btn.classList.add('correct');
+    if (btnValue === playerAnswer && playerAnswer !== correct) btn.classList.add('wrong');
+  });
+
+  if (playerAnswer === correct) {
+    handleCorrect();
+  } else {
+    handleWrong();
+  }
+
+  setTimeout(() => {
+    if (!state.gameOver && !state.won) loadNewQuestion();
+  }, 1500);
+}
+
+function handleShortAnswer() {
+  if (state.questionAnswered || state.gameOver || state.won) return;
+
+  const input = document.getElementById('shortAnswerInput');
+  if (!input) return;
+
+  const raw = input.value.trim();
+  const val = parseFloat(raw);
+
+  if (raw === '' || isNaN(val)) {
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 500);
+    return;
+  }
+
+  state.questionAnswered = true;
+  input.disabled = true;
+  const submitBtn = document.getElementById('shortAnswerSubmit');
+  if (submitBtn) submitBtn.disabled = true;
+
+  const q = state.currentQuestion;
+  const isCorrect = Math.abs(val - q.answer) <= q.tolerance;
+
+  input.classList.add(isCorrect ? 'input-correct' : 'input-wrong');
+
+  const explanationEl = document.getElementById('explanationText');
+  if (explanationEl && q.explanation) {
+    explanationEl.textContent = (isCorrect ? '✓ ' : '✗ ') + q.explanation;
+    explanationEl.style.display = 'block';
+    explanationEl.style.color = isCorrect ? '#1a5a1a' : '#7a1010';
+  }
+
+  if (isCorrect) {
     handleCorrect();
   } else {
     handleWrong();

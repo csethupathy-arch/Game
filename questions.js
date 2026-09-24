@@ -432,10 +432,10 @@ const QUESTIONS = [
   {
     tier: 2,
     type: 'multiple-choice',
-    question: "A 10 kg box slides on a surface with coefficient of kinetic friction μₖ = 0.3. What is the friction force? (g = 10 m/s²)",
+    question: "A 10 kg box slides on a surface with coefficient of kinetic friction μk = 0.3. What is the friction force? (g = 10 m/s²)",
     options: ["3 N", "30 N", "0.3 N", "100 N"],
     correct: 1,
-    explanation: "Friction force = μₖ × N = μₖ × mg = 0.3 × 10 × 10 = 30 N."
+    explanation: "Friction force = μk × N = μk × mg = 0.3 × 10 × 10 = 30 N."
   },
   {
     tier: 2,
@@ -492,37 +492,13 @@ const QUESTIONS = [
   {
     tier: 4,
     type: 'multiple-choice',
-    question: "Two charged particles each with charge q are separated by distance r. If both charges are doubled, the electric force:",
-    options: ["Doubles", "Stays the same", "Quadruples", "Is halved"],
-    correct: 2,
-    explanation: "Coulomb's law: F = kq₁q₂/r². Doubling both q₁ and q₂ multiplies the force by 2 × 2 = 4."
-  },
-  {
-    tier: 4,
-    type: 'multiple-choice',
     question: "The centripetal acceleration of an object moving in a circle of radius r at speed v is:",
     options: ["v/r", "v²/r", "vr", "r/v²"],
     correct: 1,
     explanation: "Centripetal acceleration a = v²/r, always pointing toward the center of the circle."
   },
 
-  // Tier 5 (new)
-  {
-    tier: 5,
-    type: 'multiple-choice',
-    question: "Two resistors of 4 Ω and 6 Ω are connected in series to a 20 V battery. What is the current?",
-    options: ["2 A", "5 A", "1.2 A", "0.5 A"],
-    correct: 0,
-    explanation: "Total resistance = 4 + 6 = 10 Ω. I = V/R = 20/10 = 2 A."
-  },
-  {
-    tier: 5,
-    type: 'multiple-choice',
-    question: "According to Ohm's Law, if resistance triples while voltage stays constant, the current:",
-    options: ["Triples", "Stays the same", "Is cut to one-third", "Doubles"],
-    correct: 2,
-    explanation: "I = V/R. If R triples, I = V/(3R) = one-third of the original current."
-  },
+  // Tier 5 (new — electricity-free)
   {
     tier: 5,
     type: 'multiple-choice',
@@ -641,13 +617,6 @@ const QUESTIONS = [
     correct: true,
     explanation: "True. This is the rotational analogue of Newton's 1st Law — no net torque means L = Iω remains constant."
   },
-  {
-    tier: 5,
-    type: 'true-false',
-    question: "In a DC circuit, resistors connected in parallel all have the same voltage across them.",
-    correct: true,
-    explanation: "True. In parallel, each branch connects the same two nodes, so each resistor experiences the same potential difference."
-  },
 
   // ===== SHORT-ANSWER (NUMERIC) QUESTIONS =====
 
@@ -682,11 +651,11 @@ const QUESTIONS = [
   {
     tier: 2,
     type: 'short-answer',
-    question: "An object accelerates from rest at 5 m/s² for 6 seconds. How far does it travel? (x = ½atl²)",
+    question: "An object accelerates from rest at 5 m/s² for 6 seconds. How far does it travel? (x = ½at²)",
     answer: 90,
     tolerance: 2,
     unit: "m",
-    explanation: "x = ½atl² = ½ × 5 × 36 = 90 m"
+    explanation: "x = ½at² = ½ × 5 × 36 = 90 m"
   },
 
   // Tier 3
@@ -778,20 +747,436 @@ const QUESTIONS = [
   {
     tier: 5,
     type: 'short-answer',
-    question: "Two 6 Ω resistors are connected in series across a 24 V battery. What is the current through the circuit?",
-    answer: 2,
-    tolerance: 0.1,
-    unit: "A",
-    explanation: "Total R = 6 + 6 = 12 Ω; I = V/R = 24/12 = 2 A"
-  },
-  {
-    tier: 5,
-    type: 'short-answer',
     question: "A 1 kg mass on a spring (k = 25 N/m) oscillates. What is its period? (T = 2π√(m/k), use π ≈ 3.14)",
     answer: 1.26,
     tolerance: 0.05,
     unit: "s",
     explanation: "T = 2π√(1/25) = 2π/5 ≈ 1.257 s ≈ 1.26 s"
+  },
+
+  // ===== NEW QUESTIONS FROM PDF SOURCES =====
+
+  // ----- KINEMATICS (5 new questions) -----
+  {
+    tier: 1,
+    type: 'multiple-choice',
+    question: "A cargo plane flying horizontally at 140 m/s drops one package, then drops a second package exactly 2 seconds later from the same altitude. Ignoring air resistance, how far apart do the two packages land on the ground?",
+    options: ["70 m", "140 m", "280 m", "420 m"],
+    correct: 2,
+    explanation: "Both packages share the plane's horizontal velocity of 140 m/s. The second package is released 2 s after the first, so it starts 2 s behind. The horizontal gap when they land is 140 × 2 = 280 m."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A cargo plane drops two packages 2 seconds apart while flying at constant horizontal velocity. Ignoring air resistance, what happens to the vertical separation between the two packages as they fall?",
+    options: [
+      "The separation decreases as both packages accelerate equally.",
+      "The separation increases because the first package has been accelerating longer.",
+      "The separation remains constant because both experience the same gravitational acceleration.",
+      "The separation depends on the mass of each package."
+    ],
+    correct: 1,
+    explanation: "Both packages accelerate at g downward. After the second is dropped, the first already has downward velocity v₁ = gΔt while the second starts at rest. The first continues to pull ahead vertically, so the gap grows."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "Bobby and Sandy each start from rest at the top of frictionless slides of equal height h. Bobby's slide curves steeply at the top before flattening, while Sandy's is a uniform straight incline. Which statement correctly describes their speeds at the bottom?",
+    options: [
+      "Bobby reaches the bottom faster, so he has a greater average speed.",
+      "Both reach the bottom with the same final speed, since both slides have the same height.",
+      "Sandy reaches the bottom faster because her straight slide is a shorter path.",
+      "Bobby has a higher final speed because his slide is steeper at the top."
+    ],
+    correct: 1,
+    explanation: "By conservation of energy on a frictionless surface, all of the gravitational PE (mgh) converts to kinetic energy regardless of the slide's shape. Both reach the bottom with the same speed v = √(2gh)."
+  },
+  {
+    tier: 3,
+    type: 'multiple-choice',
+    question: "An eagle flies north at 30 m/s relative to the ground. A turtle walks south at 5 m/s relative to the ground. What is the speed of the eagle as measured by the turtle?",
+    options: ["25 m/s", "30 m/s", "35 m/s", "150 m/s"],
+    correct: 2,
+    explanation: "The eagle moves north at +30 m/s and the turtle moves south at −5 m/s (taking north as positive). Relative velocity of eagle with respect to turtle = 30 − (−5) = 35 m/s northward."
+  },
+  {
+    tier: 1,
+    type: 'true-false',
+    question: "When two skaters on a frictionless ice rink push off each other from rest, the internal forces between them can change the total momentum of the two-skater system.",
+    correct: false,
+    explanation: "False. Internal forces appear as Newton's Third Law pairs that cancel within the system. Only an external net force changes a system's total momentum. On frictionless ice, no external horizontal force acts, so total momentum remains zero."
+  },
+
+  // ----- DYNAMICS (5 new questions) -----
+  {
+    tier: 1,
+    type: 'multiple-choice',
+    question: "A martial artist kicks a target with a force of 200 N. According to Newton's Third Law, which statement correctly describes the target's effect on the foot during the kick?",
+    options: [
+      "The target exerts no force on the foot.",
+      "The target exerts a 100 N force on the foot in the same direction as the kick.",
+      "The target exerts a 400 N force on the foot in the opposite direction.",
+      "The target exerts an equal 200 N force on the foot in the opposite direction."
+    ],
+    correct: 3,
+    explanation: "Newton's Third Law: action-reaction pairs are equal in magnitude and opposite in direction. The target pushes back on the foot with exactly 200 N."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A sled of mass m is pulled at constant velocity along a flat surface by a force F applied at an angle θ above the horizontal. Which expression correctly gives the coefficient of kinetic friction μk?",
+    options: [
+      "μk = mg / F",
+      "μk = F cosθ / (mg − F sinθ)",
+      "μk = F sinθ / mg",
+      "μk = F / mg"
+    ],
+    correct: 1,
+    explanation: "At constant velocity, net force = 0. Horizontal: F cosθ = μkN. Vertical: N = mg − F sinθ. Therefore μk = F cosθ / (mg − F sinθ)."
+  },
+  {
+    tier: 2,
+    type: 'short-answer',
+    question: "An Atwood machine has a 3 kg mass and a 5 kg mass connected by a massless string over a frictionless pulley. What is the tension in the string during the motion? (g = 10 m/s²)",
+    answer: 37.5,
+    tolerance: 0.5,
+    unit: "N",
+    explanation: "Acceleration: a = (m₂ − m₁)g / (m₁ + m₂) = (2 × 10) / 8 = 2.5 m/s². Tension: T = m₁(g + a) = 3 × 12.5 = 37.5 N."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "Three identical closed jars sit on separate scales. Jar A contains 3 fireflies flying inside. Jar B contains 1 firefly flying inside. Jar C contains 1 firefly resting on the bottom. Rank the scale readings from greatest to least.",
+    options: [
+      "A = B = C, since the total weight of fireflies is what matters",
+      "A > B = C",
+      "A > B > C, since flying fireflies push harder on the air",
+      "C > B, because the resting firefly adds weight directly to the jar floor"
+    ],
+    correct: 1,
+    explanation: "In a closed jar, a flying insect pushes air downward, and the air pressure pushes down on the jar floor with a force equal to the fly's weight. Whether flying or resting, one fly contributes the same to the scale. Jar A has 3 flies, B and C each have 1: A > B = C."
+  },
+  {
+    tier: 3,
+    type: 'multiple-choice',
+    question: "A 20 kg sled slides down a 30° slope at constant velocity. What is the coefficient of kinetic friction between the sled and the slope? (g = 10 m/s², sin30° = 0.50, cos30° = 0.87)",
+    options: ["0.29", "0.50", "0.58", "0.87"],
+    correct: 2,
+    explanation: "At constant velocity, net force = 0. Along the slope: mg sin30° = μk mg cos30°. Dividing: μk = tan30° = 0.50 / 0.87 ≈ 0.58."
+  },
+
+  // ----- WORK / ENERGY / POWER (5 new questions) -----
+  {
+    tier: 1,
+    type: 'multiple-choice',
+    question: "After a single push on a frictionless horizontal surface, can a block slide up a frictionless inclined plane at constant speed?",
+    options: [
+      "No — on a frictionless incline the block must accelerate or decelerate; constant speed requires a continuous applied force.",
+      "Yes — if pushed with just the right initial speed, it moves at constant speed.",
+      "Yes — inertia keeps its speed constant on any frictionless surface.",
+      "No — the block will immediately stop at the base of the incline."
+    ],
+    correct: 0,
+    explanation: "On a frictionless incline, gravity's component along the slope (mg sinθ) acts unopposed after the push ends. The block must decelerate while going up. Constant speed requires a continuously applied force to balance mg sinθ."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "Under what condition can a block slide DOWN a frictionless inclined plane at constant velocity?",
+    options: [
+      "Only if an external force pushes it up the slope at just the right magnitude.",
+      "It is impossible: a block on a frictionless incline always accelerates downward.",
+      "It can happen if the incline angle is exactly 45°.",
+      "Only if the block's weight equals the normal force."
+    ],
+    correct: 1,
+    explanation: "On a frictionless incline, the net force along the slope is always mg sinθ downward (nonzero for any angle > 0°). Nothing balances this, so the block always accelerates. Constant speed needs friction to oppose gravity — impossible without friction."
+  },
+  {
+    tier: 2,
+    type: 'short-answer',
+    question: "Bob pushes a 30 kg box across a horizontal floor at constant speed v = 1.0 m/s. The coefficient of kinetic friction is μk = 0.30. What power does Bob exert on the box? (g = 10 m/s²)",
+    answer: 90,
+    tolerance: 1,
+    unit: "W",
+    explanation: "At constant speed, applied force = friction force = μk mg = 0.30 × 30 × 10 = 90 N. Power = F × v = 90 × 1.0 = 90 W."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A roller coaster car must maintain contact with the track at the top of a circular loop of radius R. Starting from rest, what is the minimum height h (measured from the bottom of the loop) needed to barely complete the loop? (Ignore friction.)",
+    options: ["h ≥ R", "h ≥ 3R/2", "h ≥ 2R", "h ≥ 5R/2"],
+    correct: 3,
+    explanation: "At the top of the loop (height 2R), minimum speed gives mg = mv²/R → v² = gR. Energy conservation: mgh = ½mv² + mg(2R) → h = v²/(2g) + 2R = R/2 + 2R = 5R/2."
+  },
+  {
+    tier: 1,
+    type: 'true-false',
+    question: "Ball A is dropped from half the height of Ball B. Ball A strikes the ground with half the speed of Ball B.",
+    correct: false,
+    explanation: "False. By energy conservation v = √(2gh). If h_A = h_B/2, then v_A = √(g h_B) = v_B / √2 ≈ 0.71 v_B. Ball A reaches about 71% of Ball B's speed, not 50%."
+  },
+
+  // ----- MOMENTUM (5 new questions) -----
+  {
+    tier: 1,
+    type: 'multiple-choice',
+    question: "A cart rolls freely on a frictionless surface at constant speed while water slowly leaks out through a hole in the bottom (the water falls straight down). What happens to the cart's speed and kinetic energy?",
+    options: [
+      "Speed increases; kinetic energy increases.",
+      "Speed stays constant; kinetic energy decreases.",
+      "Speed decreases; kinetic energy stays constant.",
+      "Speed and kinetic energy both stay constant."
+    ],
+    correct: 1,
+    explanation: "Leaking water falls straight down, carrying away mass but leaving with the same horizontal velocity as the cart. By momentum conservation, the cart's horizontal speed remains constant. Since KE = ½mv² and mass m decreases while v is constant, the cart's KE decreases."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A cart of mass m moving at speed v collides and sticks with an identical stationary cart (perfectly inelastic collision). What fraction of the original kinetic energy is retained after the collision?",
+    options: [
+      "All kinetic energy is retained (100%).",
+      "50% of the kinetic energy is retained.",
+      "25% of the kinetic energy is retained.",
+      "None — all kinetic energy is lost (0%)."
+    ],
+    correct: 1,
+    explanation: "Momentum conservation: mv = 2m v'. So v' = v/2. KE_final = ½(2m)(v/2)² = mv²/4 = 50% of KE_initial = ½mv². Half the kinetic energy is lost."
+  },
+  {
+    tier: 3,
+    type: 'multiple-choice',
+    question: "Ball A (elastic, bounces back) and Ball B (clay, sticks) of equal mass and equal speed are each thrown at an identical stationary block. Ball A reverses with its original speed; Ball B sticks to the block. Which ball delivers greater impulse to the block, and which collision results in greater kinetic energy loss?",
+    options: [
+      "Ball B delivers greater impulse; Ball B causes greater KE loss.",
+      "Ball A delivers greater impulse; Ball B causes greater KE loss.",
+      "Ball A delivers greater impulse; Ball A causes greater KE loss.",
+      "Both deliver equal impulse; Ball B causes greater KE loss."
+    ],
+    correct: 1,
+    explanation: "Ball A: Δp = m(v − (−v)) = 2mv. Ball B: Δp = m(v − 0) = mv. Ball A delivers twice the impulse. Ball B's perfectly inelastic collision causes maximum KE loss, while Ball A's elastic collision conserves KE."
+  },
+  {
+    tier: 2,
+    type: 'short-answer',
+    question: "A 2 kg sphere initially at rest receives an impulse of 10 N·s. What is its final speed?",
+    answer: 5,
+    tolerance: 0.2,
+    unit: "m/s",
+    explanation: "Impulse = change in momentum: J = mΔv. 10 = 2 × v → v = 5 m/s."
+  },
+  {
+    tier: 2,
+    type: 'true-false',
+    question: "In a perfectly inelastic collision between two objects, kinetic energy is conserved.",
+    correct: false,
+    explanation: "False. In a perfectly inelastic collision, the objects stick together and maximum kinetic energy is converted to internal energy (heat, sound, deformation). Only momentum is conserved."
+  },
+
+  // ----- GRAVITY (5 new questions) -----
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A satellite orbits Earth in a circular orbit at altitude h = 2R above the surface (where R is Earth's radius, M is Earth's mass, G is the gravitational constant). What is the satellite's orbital speed?",
+    options: ["v = √(GM/R)", "v = √(GM/2R)", "v = √(GM/3R)", "v = √(2GM/3R)"],
+    correct: 2,
+    explanation: "Orbital radius = R + 2R = 3R. Setting gravitational force equal to centripetal force: GMm/(3R)² = mv²/(3R). Solving: v² = GM/(3R) → v = √(GM/3R)."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "Which combination of changes would increase the gravitational field strength g at the surface of a planet?",
+    options: [
+      "Increasing the planet's mass and increasing its radius.",
+      "Decreasing the planet's mass and decreasing its radius.",
+      "Increasing the planet's mass and decreasing its radius.",
+      "Decreasing the planet's mass and increasing its radius."
+    ],
+    correct: 2,
+    explanation: "g = GM/R². Increasing M (numerator) raises g; decreasing R makes R² smaller, also raising g. Both changes together increase g."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A spaceship in a low circular orbit around Earth wants to move to a higher orbit. In which direction should it fire its engines to most efficiently achieve this?",
+    options: [
+      "Opposite to the direction of motion (retrograde).",
+      "In the direction of motion (prograde).",
+      "Directly toward Earth.",
+      "Directly away from Earth."
+    ],
+    correct: 1,
+    explanation: "Firing prograde (in the direction of motion) increases orbital energy and speed, raising the apoapsis to a higher altitude. This is the first burn of a Hohmann transfer. Retrograde firing would lower the orbit."
+  },
+  {
+    tier: 4,
+    type: 'multiple-choice',
+    question: "Planet Unicorn has mass M = 1.0 × 10²⁵ kg and radius R = 4.0 × 10⁶ m. A rock is thrown horizontally at 20 m/s from the top of a 100 m cliff on this planet. How far from the base of the cliff does the rock land? (G = 6.67 × 10⁻¹¹ N·m²/kg²)",
+    options: ["0.044 m", "22 m", "43.8 m", "90 m"],
+    correct: 2,
+    explanation: "Surface gravity: g = GM/R² = (6.67×10⁻¹¹)(10²⁵)/(4×10⁶)² ≈ 41.7 m/s². Fall time: t = √(2h/g) = √(200/41.7) ≈ 2.19 s. Horizontal distance: x = 20 × 2.19 ≈ 43.8 m."
+  },
+  {
+    tier: 4,
+    type: 'true-false',
+    question: "According to Newton's Law of Universal Gravitation, if the distance between two masses is tripled, the gravitational force between them becomes one-ninth of its original value.",
+    correct: true,
+    explanation: "True. F = Gm₁m₂/r². Tripling r replaces r² with (3r)² = 9r², reducing the force by a factor of 9."
+  },
+
+  // ----- ROTATION (5 new questions) -----
+  {
+    tier: 1,
+    type: 'short-answer',
+    question: "A 3 m seesaw has a 50 kg boy sitting at one end and a 40 kg girl sitting at the other end. How far from the girl's end should the fulcrum be placed so the seesaw is balanced? (g = 10 m/s²)",
+    answer: 1.67,
+    tolerance: 0.05,
+    unit: "m",
+    explanation: "Torque balance about the fulcrum: 40 × d = 50 × (3 − d). 40d = 150 − 50d → 90d = 150 → d = 5/3 ≈ 1.67 m from the girl."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A disk of mass M and radius R rotates freely on a frictionless axle. Jean stands at the center; when she walks to the rim, the disk's angular speed decreases to one-quarter of its original value. What can you conclude about Jean's mass?",
+    options: [
+      "Jean's mass is less than M/2.",
+      "Jean's mass equals M.",
+      "Jean's mass is between M and 2M.",
+      "Jean's mass is greater than 2M."
+    ],
+    correct: 2,
+    explanation: "Conservation of angular momentum: ½MR² × ω = (½MR² + m_J R²) × ω/4. Solving: 2MR² = ½MR² + m_J R² → m_J = 3M/2, which lies between M and 2M."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A solid ball (rolling without slipping) and a frictionless block are released from rest at the same height on identical ramps. They then travel onto a second frictionless ramp. Which reaches a greater height on the second ramp?",
+    options: [
+      "The ball, because it has additional rotational kinetic energy at the bottom.",
+      "They reach the same height because both started from the same height.",
+      "The block, because all its kinetic energy at the bottom is translational.",
+      "They reach the same height because mechanical energy is conserved for both."
+    ],
+    correct: 2,
+    explanation: "The rolling ball stores some energy as rotational KE, leaving it with less translational KE at the ramp's base. On the frictionless second ramp, only translational KE converts to PE. The block (all KE translational) rises higher."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A hoop (I = 0.10 kg·m²) spins at ω = 5.0 rad/s. A tangential force F = 2.0 N is applied for t = 3.0 s, accelerating it to ω = 10 rad/s. At what radius from the center was the force applied?",
+    options: ["8.3 cm", "12.5 cm", "16.7 cm", "25.0 cm"],
+    correct: 0,
+    explanation: "Angular impulse = ΔL: τ × t = I × Δω. (F × r) × 3.0 = 0.10 × 5 = 0.50. F × r = 0.50/3.0 ≈ 0.167 N·m. r = 0.167/2.0 ≈ 0.083 m = 8.3 cm."
+  },
+  {
+    tier: 3,
+    type: 'short-answer',
+    question: "A uniform 8.0 m ladder of mass 20 kg leans against a frictionless vertical wall at 60° above the horizontal. What minimum coefficient of static friction μs between the ladder and the floor prevents slipping? (g = 10 m/s², sin60° = 0.866, cos60° = 0.500)",
+    answer: 0.29,
+    tolerance: 0.02,
+    unit: "",
+    explanation: "Torque about the foot: N_wall × 8 sin60° = mg × 4 cos60°. N_wall = (200 × 4 × 0.5)/(8 × 0.866) ≈ 57.7 N. Horizontal equilibrium: friction = N_wall = 57.7 N. N_floor = mg = 200 N. μs = 57.7/200 ≈ 0.29."
+  },
+
+  // ----- OSCILLATIONS (5 new questions) -----
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "Which of the following statements about a spring-block system undergoing simple harmonic motion is FALSE?",
+    options: [
+      "The restoring force is proportional to the block's displacement from equilibrium.",
+      "The acceleration and velocity vectors of the block always point in the same direction.",
+      "At maximum displacement, the block's speed is zero.",
+      "The total mechanical energy remains constant throughout the oscillation."
+    ],
+    correct: 1,
+    explanation: "False: Acceleration points toward equilibrium (opposite to displacement), while velocity points in the direction of motion. At equilibrium the speed is maximum but acceleration is zero; at maximum displacement speed is zero but acceleration is maximum. They are not always in the same direction."
+  },
+  {
+    tier: 2,
+    type: 'short-answer',
+    question: "A spring with k = 40 N/m has a 0.25 kg block attached to it. What is the period of oscillation? (Use π ≈ 3.14)",
+    answer: 0.50,
+    tolerance: 0.02,
+    unit: "s",
+    explanation: "T = 2π√(m/k) = 2π√(0.25/40) = 2π × 0.0791 ≈ 0.497 s ≈ 0.50 s."
+  },
+  {
+    tier: 2,
+    type: 'short-answer',
+    question: "A spring with k = 50 N/m supports a 0.50 kg block hanging vertically in equilibrium. How far does the spring stretch from its natural length? (g = 10 m/s²)",
+    answer: 0.10,
+    tolerance: 0.005,
+    unit: "m",
+    explanation: "At equilibrium, spring force = weight: kx = mg → x = mg/k = (0.50 × 10)/50 = 0.10 m."
+  },
+  {
+    tier: 3,
+    type: 'multiple-choice',
+    question: "A student measures the period of a pendulum at small angles and finds T = 1.00 s. When released from 45°, the measured period is about 5% longer. What is the best explanation?",
+    options: [
+      "Air resistance is stronger at larger amplitudes, slowing the pendulum.",
+      "The gravitational field weakens slightly as the pendulum swings higher.",
+      "At large angles, the small-angle approximation breaks down; the actual restoring force is smaller than predicted by T = 2π√(L/g).",
+      "The pendulum bob gains inertia when moving faster at large angles."
+    ],
+    correct: 2,
+    explanation: "T = 2π√(L/g) assumes sinθ ≈ θ. At 45°, sin45° ≈ 0.707 while θ ≈ 0.785 rad, so the actual restoring force is smaller than the linear approximation predicts, yielding a longer period."
+  },
+  {
+    tier: 1,
+    type: 'true-false',
+    question: "For an ideal spring-mass system undergoing simple harmonic motion, the period increases when the amplitude of oscillation increases.",
+    correct: false,
+    explanation: "False. For SHM, T = 2π√(m/k), which is independent of amplitude. The period depends only on mass and spring constant."
+  },
+
+  // ----- WAVES (5 new questions) -----
+  {
+    tier: 1,
+    type: 'multiple-choice',
+    question: "A fire truck is driving away from a stationary observer with its siren on. Compared to the siren's emitted frequency and intensity, what does the stationary observer perceive?",
+    options: [
+      "Higher frequency and higher intensity than emitted.",
+      "Lower frequency and lower intensity than emitted.",
+      "The same frequency but lower intensity.",
+      "Higher frequency but lower intensity."
+    ],
+    correct: 1,
+    explanation: "Doppler effect: a receding source produces a lower observed frequency (red-shift). As the truck moves away, distance increases, reducing intensity (intensity ∝ 1/r²). Both frequency and intensity are lower than emitted."
+  },
+  {
+    tier: 1,
+    type: 'multiple-choice',
+    question: "A guitar string produces 2 beats per second when sounded with a 110 Hz tuning fork. The player tightens the string to bring it into tune. What was the string's original frequency?",
+    options: ["108 Hz", "110 Hz", "112 Hz", "Cannot be determined"],
+    correct: 0,
+    explanation: "Beat frequency = |f_string − f_fork| = 2 Hz, so the string is at 108 Hz or 112 Hz. Tightening raises frequency; since tightening brings it to 110 Hz, the string must have been below 110 Hz — i.e., 108 Hz."
+  },
+  {
+    tier: 1,
+    type: 'short-answer',
+    question: "A wave travels at 16 m/s in medium 1 with a wavelength of 4 m. It enters medium 2 where its speed doubles to 32 m/s. What is the wavelength of the wave in medium 2? (Frequency is unchanged.)",
+    answer: 8,
+    tolerance: 0.2,
+    unit: "m",
+    explanation: "Frequency is constant: f = v₁/λ₁ = 16/4 = 4 Hz. In medium 2: λ₂ = v₂/f = 32/4 = 8 m."
+  },
+  {
+    tier: 2,
+    type: 'multiple-choice',
+    question: "A guitar string of length L = 0.30 m carries waves at speed v = 450 m/s. What is the fundamental (lowest) frequency of vibration?",
+    options: ["375 Hz", "750 Hz", "900 Hz", "1500 Hz"],
+    correct: 1,
+    explanation: "For the fundamental mode, L = λ/2 → λ = 2L = 0.60 m. Frequency: f = v/λ = 450/0.60 = 750 Hz."
+  },
+  {
+    tier: 2,
+    type: 'true-false',
+    question: "When a wave travels from one medium into another, its frequency changes to match the new medium's properties.",
+    correct: false,
+    explanation: "False. The frequency of a wave is set by its source and remains constant as it crosses a boundary. What changes is the wave speed (and therefore wavelength, since v = fλ). Frequency is invariant across media."
   }
 ];
 

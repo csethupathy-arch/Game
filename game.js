@@ -17,6 +17,7 @@ function Animal(type, x, y) {
   this.combustTimer = 0;
   this.opacity = 1;
   this.sparkles = [];
+  this.penned = false;
 }
 
 const QUESTION_PANEL_HEIGHT = 220;
@@ -90,11 +91,21 @@ function resizeCanvas() {
 function getPastureBounds() {
   const h = canvas.height;
   const w = canvas.width;
+  const hasPens = state.animals.some(a => a.penned);
   return {
-    left: 20,
-    right: w - 20,
-    top: h * 0.45,
+    left:   hasPens ? w * 0.16 : 20,
+    right:  hasPens ? w * 0.84 : w - 20,
+    top:    h * 0.45,
     bottom: h - 10
+  };
+}
+
+function getPenZones() {
+  const w = canvas.width, h = canvas.height;
+  return {
+    goat:  { x: 10,           y: h * 0.58, w: w * 0.14, h: h * 0.38 },
+    sheep: { x: w * 0.86,     y: h * 0.58, w: w * 0.14, h: h * 0.38 },
+    cow:   { x: 10,           y: h * 0.40, w: w * 0.12, h: h * 0.17 },
   };
 }
 
@@ -331,6 +342,10 @@ function handleCorrect() {
     state.phase = rebuildTarget;
     spawnAnimal(rebuildTarget);
     spawnAnimal(rebuildTarget);
+    // Re-pen animals from the stage below the one we're re-entering
+    const penMap = { sheep: 'goat', cow: 'sheep', horse: 'cow' };
+    const toPen = penMap[rebuildTarget];
+    if (toPen) penAnimals(toPen);
     checkThresholds();
     return;
   }
@@ -405,6 +420,7 @@ function revertToPreviousStage(fromStage) {
   else return;
 
   state.phase = prevStage;
+  releaseFromPen(prevStage);
   restoreStage(prevStage, threshold);
 }
 
@@ -461,6 +477,7 @@ function checkThresholds() {
 
   if (state.phase === 'goat' && goats >= 100) {
     state.phase = 'sheep';
+    penAnimals('goat');
     spawnAnimal('sheep');
     spawnAnimal('sheep');
     // If we were rebuilding sheep (threshold re-hit via breeding rather than
@@ -473,6 +490,7 @@ function checkThresholds() {
     }
   } else if (state.phase === 'sheep' && sheep >= 200) {
     state.phase = 'cow';
+    penAnimals('sheep');
     spawnAnimal('cow');
     spawnAnimal('cow');
     const idx = state.rebuildingStack.lastIndexOf('cow');
@@ -483,6 +501,7 @@ function checkThresholds() {
     }
   } else if (state.phase === 'cow' && cows >= 300) {
     state.phase = 'horse';
+    penAnimals('cow');
     spawnAnimal('horse');
     spawnAnimal('horse');
     const idx = state.rebuildingStack.lastIndexOf('horse');
@@ -527,6 +546,7 @@ function restartGame() {
   state.horses = 0;
   state.phase = 'goat';
   state.rebuildingStack = [];
+  state.animals.forEach(a => a.penned = false);
   state.animals = [];
   state.hearts = [];
   state.confetti = [];
@@ -548,6 +568,32 @@ function restartGame() {
   }
 
   loadNewQuestion();
+}
+
+// --- Pen system ---
+function penAnimals(type) {
+  const pen = getPenZones()[type];
+  const b = { left: pen.x + 5, right: pen.x + pen.w - 5, top: pen.y + 5, bottom: pen.y + pen.h - 5 };
+  state.animals.filter(a => a.type === type).forEach(a => {
+    a.penned = true;
+    // Teleport into pen if currently outside it
+    if (a.x < b.left || a.x > b.right || a.y < b.top || a.y > b.bottom) {
+      a.x = b.left + Math.random() * (b.right - b.left);
+      a.y = b.top + Math.random() * (b.bottom - b.top);
+    }
+  });
+}
+
+function releaseFromPen(type) {
+  const b = getPastureBounds();
+  state.animals.filter(a => a.type === type && a.penned).forEach(a => {
+    a.penned = false;
+    // Scatter them across the main pasture
+    a.x = b.left + Math.random() * (b.right - b.left);
+    a.y = b.top + Math.random() * (b.bottom - b.top);
+    a.vx = (Math.random() - 0.5) * 0.3;
+    a.vy = (Math.random() - 0.5) * 0.1;
+  });
 }
 
 // --- Heart & Confetti Effects ---
@@ -639,6 +685,36 @@ function drawHills(w, h) {
   ctx.lineTo(0, h);
   ctx.closePath();
   ctx.fill();
+}
+
+function drawPen(pen, label) {
+  // Slightly darker grass inside pen
+  ctx.fillStyle = 'rgba(80, 120, 60, 0.4)';
+  ctx.fillRect(pen.x, pen.y, pen.w, pen.h);
+
+  // Fence rails (horizontal brown lines)
+  ctx.strokeStyle = '#8B6914';
+  ctx.lineWidth = 3;
+  const railY = [pen.y + pen.h * 0.25, pen.y + pen.h * 0.6];
+  railY.forEach(ry => {
+    ctx.beginPath(); ctx.moveTo(pen.x, ry); ctx.lineTo(pen.x + pen.w, ry); ctx.stroke();
+  });
+  // Top rail
+  ctx.beginPath(); ctx.moveTo(pen.x, pen.y + 4); ctx.lineTo(pen.x + pen.w, pen.y + 4); ctx.stroke();
+
+  // Fence posts (vertical brown rectangles)
+  ctx.fillStyle = '#7A5C10';
+  const postCount = Math.floor(pen.w / 20);
+  for (let i = 0; i <= postCount; i++) {
+    const px = pen.x + (i / postCount) * pen.w;
+    ctx.fillRect(px - 3, pen.y - 4, 6, pen.h + 8);
+  }
+
+  // Small label above pen
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.font = 'bold 11px Georgia';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, pen.x + pen.w / 2, pen.y - 8);
 }
 
 // --- Animal Drawing ---
@@ -1147,6 +1223,14 @@ function gameLoop(timestamp) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground(timestamp);
 
+  // Draw pens before animals so animals render on top
+  const penZones = getPenZones();
+  const occupiedTypes = [...new Set(state.animals.filter(a => a.penned).map(a => a.type))];
+  const penLabels = { goat: '🐐 Pen', sheep: '🐑 Pen', cow: '🐄 Pen' };
+  for (const type of occupiedTypes) {
+    if (penZones[type]) drawPen(penZones[type], penLabels[type]);
+  }
+
   const b = getPastureBounds();
 
   for (const animal of [...state.animals]) {
@@ -1177,10 +1261,19 @@ function gameLoop(timestamp) {
       animal.x += animal.vx;
       animal.y += animal.vy * 0.4;
 
-      if (animal.x < b.left + 10) { animal.vx = Math.abs(animal.vx); }
-      if (animal.x > b.right - 10) { animal.vx = -Math.abs(animal.vx); }
-      if (animal.y < b.top + 5) { animal.vy = Math.abs(animal.vy); }
-      if (animal.y > b.bottom - 5) { animal.vy = -Math.abs(animal.vy); }
+      if (animal.penned) {
+        const pen = penZones[animal.type];
+        const pb = { left: pen.x + 5, right: pen.x + pen.w - 5, top: pen.y + 5, bottom: pen.y + pen.h - 5 };
+        if (animal.x < pb.left)   { animal.vx = Math.abs(animal.vx); }
+        if (animal.x > pb.right)  { animal.vx = -Math.abs(animal.vx); }
+        if (animal.y < pb.top)    { animal.vy = Math.abs(animal.vy); }
+        if (animal.y > pb.bottom) { animal.vy = -Math.abs(animal.vy); }
+      } else {
+        if (animal.x < b.left + 10)  { animal.vx = Math.abs(animal.vx); }
+        if (animal.x > b.right - 10) { animal.vx = -Math.abs(animal.vx); }
+        if (animal.y < b.top + 5)    { animal.vy = Math.abs(animal.vy); }
+        if (animal.y > b.bottom - 5) { animal.vy = -Math.abs(animal.vy); }
+      }
 
       animal.facing = animal.vx >= 0 ? 1 : -1;
 

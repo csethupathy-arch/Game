@@ -932,119 +932,126 @@ function drawTotoro(ts) {
   // Shadow
   ctx.fillStyle = 'rgba(0,0,0,0.15)';
   ctx.beginPath();
-  ctx.ellipse(0, s * 0.85, s * 0.55, s * 0.12, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, s * 0.88, s * 0.58, s * 0.13, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Main body (gray)
-  ctx.fillStyle = '#6B7280';
+  // Main body — rounder, more spherical
+  ctx.fillStyle = '#7A8290';
   ctx.beginPath();
-  ctx.arc(0, 0, s * 0.75, 0, Math.PI * 2);
+  ctx.arc(0, 0, s * 0.78, 0, Math.PI * 2);
   ctx.fill();
 
-  // White belly
-  ctx.fillStyle = '#F0F0EC';
+  // White belly — wide oval
+  ctx.fillStyle = '#F5F5F0';
   ctx.beginPath();
-  ctx.ellipse(0, s * 0.18, s * 0.5, s * 0.58, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, s * 0.15, s * 0.52, s * 0.62, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Belly markings
-  ctx.strokeStyle = '#D4D4CC';
+  // Belly chevron/V markings (real Totoro has V-shapes, not arcs)
+  ctx.strokeStyle = '#C0C0B8';
   ctx.lineWidth = s * 0.04;
   ctx.lineCap = 'round';
-  for (let i = 0; i < 4; i++) {
-    const my = s * (0.05 + i * 0.18);
+  ctx.lineJoin = 'round';
+  for (let i = 0; i < 5; i++) {
+    const my = s * (-0.12 + i * 0.18);
+    const hw = s * (0.07 + i * 0.07);
     ctx.beginPath();
-    ctx.arc(0, my + s*0.12, s * (0.18 + i*0.06), Math.PI * 0.2, Math.PI * 0.8);
+    ctx.moveTo(-hw, my);
+    ctx.lineTo(0, my + s * 0.08);
+    ctx.lineTo(hw, my);
     ctx.stroke();
   }
 
-  // Ears (pointy)
-  ctx.fillStyle = '#6B7280';
+  // Ears — SMALLER, broader triangles (not super tall spikes)
+  ctx.fillStyle = '#7A8290';
+  // Left
   ctx.beginPath();
-  ctx.moveTo(-s * 0.35, -s * 0.65);
-  ctx.lineTo(-s * 0.5, -s * 1.15);
-  ctx.lineTo(-s * 0.12, -s * 0.75);
+  ctx.moveTo(-s * 0.40, -s * 0.60);
+  ctx.lineTo(-s * 0.55, -s * 0.90);
+  ctx.lineTo(-s * 0.17, -s * 0.66);
   ctx.closePath();
   ctx.fill();
+  // Right
   ctx.beginPath();
-  ctx.moveTo(s * 0.35, -s * 0.65);
-  ctx.lineTo(s * 0.5, -s * 1.15);
-  ctx.lineTo(s * 0.12, -s * 0.75);
+  ctx.moveTo(s * 0.40, -s * 0.60);
+  ctx.lineTo(s * 0.55, -s * 0.90);
+  ctx.lineTo(s * 0.17, -s * 0.66);
   ctx.closePath();
   ctx.fill();
-
   // Inner ear
-  ctx.fillStyle = '#8B9299';
+  ctx.fillStyle = '#9BA3AD';
   ctx.beginPath();
-  ctx.moveTo(-s*0.32, -s*0.72); ctx.lineTo(-s*0.44, -s*1.05); ctx.lineTo(-s*0.18, -s*0.78); ctx.closePath(); ctx.fill();
+  ctx.moveTo(-s * 0.38, -s * 0.63);
+  ctx.lineTo(-s * 0.50, -s * 0.84);
+  ctx.lineTo(-s * 0.21, -s * 0.69);
+  ctx.closePath();
+  ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(s*0.32, -s*0.72); ctx.lineTo(s*0.44, -s*1.05); ctx.lineTo(s*0.18, -s*0.78); ctx.closePath(); ctx.fill();
+  ctx.moveTo(s * 0.38, -s * 0.63);
+  ctx.lineTo(s * 0.50, -s * 0.84);
+  ctx.lineTo(s * 0.21, -s * 0.69);
+  ctx.closePath();
+  ctx.fill();
 
-  // Eyes (wide white)
+  // Eyes — wide, friendly oval
   ctx.fillStyle = 'white';
-  ctx.beginPath(); ctx.ellipse(-s*0.25, -s*0.28, s*0.2, s*0.25, 0, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(s*0.25, -s*0.28, s*0.2, s*0.25, 0, 0, Math.PI*2); ctx.fill();
-
-  // Pupils
+  ctx.beginPath(); ctx.ellipse(-s * 0.26, -s * 0.22, s * 0.18, s * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( s * 0.26, -s * 0.22, s * 0.18, s * 0.22, 0, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#1A1A1A';
-  ctx.beginPath(); ctx.ellipse(-s*0.25, -s*0.26, s*0.13, s*0.17, 0, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(s*0.25, -s*0.26, s*0.13, s*0.17, 0, 0, Math.PI*2); ctx.fill();
-
-  // Eye shine
+  ctx.beginPath(); ctx.ellipse(-s * 0.26, -s * 0.20, s * 0.12, s * 0.15, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( s * 0.26, -s * 0.20, s * 0.12, s * 0.15, 0, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = 'white';
-  ctx.beginPath(); ctx.arc(-s*0.2, -s*0.32, s*0.05, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(s*0.3, -s*0.32, s*0.05, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-s * 0.21, -s * 0.27, s * 0.05, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc( s * 0.31, -s * 0.27, s * 0.05, 0, Math.PI * 2); ctx.fill();
 
-  // Nose
+  // Nose — small triangular cat nose
   ctx.fillStyle = '#4A4A50';
-  ctx.beginPath(); ctx.arc(0, -s*0.1, s*0.05, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0,     -s * 0.06);
+  ctx.lineTo(-s * 0.05, s * 0.01);
+  ctx.lineTo( s * 0.05, s * 0.01);
+  ctx.closePath();
+  ctx.fill();
 
-  // Whiskers
-  ctx.strokeStyle = '#4A4A50';
-  ctx.lineWidth = s * 0.025;
-  [[-1, -0.5], [-1, -0.15], [-1, 0.2], [1, -0.5], [1, -0.15], [1, 0.2]].forEach(([dir, angle]) => {
+  // Whiskers — 3 per side
+  ctx.strokeStyle = '#5A5A60';
+  ctx.lineWidth = s * 0.02;
+  ctx.lineCap = 'round';
+  [[-1, -0.5], [-1, -0.05], [-1, 0.4], [1, -0.5], [1, -0.05], [1, 0.4]].forEach(([dir, angle]) => {
     ctx.beginPath();
-    ctx.moveTo(dir * s * 0.06, s * 0.01);
-    ctx.lineTo(dir * s * 0.42, s * (angle * 0.15));
+    ctx.moveTo(dir * s * 0.07, s * 0.04);
+    ctx.lineTo(dir * s * 0.44, s * (angle * 0.12));
     ctx.stroke();
   });
 
-  // Dancing arms
-  const armAngle = Math.sin(ts * 0.003) * 0.5;
-  ctx.strokeStyle = '#6B7280';
-  ctx.lineWidth = s * 0.12;
+  // Dancing arms — stubby
+  const armAngle = Math.sin(ts * 0.003) * 0.45;
+  ctx.strokeStyle = '#7A8290';
+  ctx.lineWidth = s * 0.14;
   ctx.lineCap = 'round';
-
   ctx.save();
-  ctx.translate(-s * 0.72, -s * 0.05);
-  ctx.rotate(-0.6 + armAngle);
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(-s * 0.4, s * 0.1);
-  ctx.stroke();
+  ctx.translate(-s * 0.74, -s * 0.08);
+  ctx.rotate(-0.5 + armAngle);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-s * 0.35, s * 0.05); ctx.stroke();
+  ctx.restore();
+  ctx.save();
+  ctx.translate(s * 0.74, -s * 0.08);
+  ctx.rotate(0.5 - armAngle);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(s * 0.35, s * 0.05); ctx.stroke();
   ctx.restore();
 
-  ctx.save();
-  ctx.translate(s * 0.72, -s * 0.05);
-  ctx.rotate(0.6 - armAngle);
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(s * 0.4, s * 0.1);
-  ctx.stroke();
-  ctx.restore();
-
-  // Chest markings
-  ctx.fillStyle = '#9BA3AD';
-  for (let i = -2; i <= 2; i++) {
-    ctx.beginPath();
-    ctx.arc(i * s * 0.14, s * 0.55, s * 0.04, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Feet
+  // Feet/paws — rounder with toe lines
   ctx.fillStyle = '#5A6270';
-  ctx.beginPath(); ctx.ellipse(-s*0.28, s*0.75, s*0.22, s*0.13, -0.2, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(s*0.28, s*0.75, s*0.22, s*0.13, 0.2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-s * 0.30, s * 0.73, s * 0.24, s * 0.14, -0.15, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( s * 0.30, s * 0.73, s * 0.24, s * 0.14,  0.15, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#4A515E';
+  ctx.lineWidth = s * 0.025;
+  [-s*0.38, -s*0.28, -s*0.18].forEach(tx => {
+    ctx.beginPath(); ctx.moveTo(tx, s * 0.68); ctx.lineTo(tx, s * 0.78); ctx.stroke();
+  });
+  [s*0.18, s*0.28, s*0.38].forEach(tx => {
+    ctx.beginPath(); ctx.moveTo(tx, s * 0.68); ctx.lineTo(tx, s * 0.78); ctx.stroke();
+  });
 
   ctx.restore();
 }
